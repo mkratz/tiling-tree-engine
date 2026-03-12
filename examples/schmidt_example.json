@@ -1,0 +1,367 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "x": -114,
+      "y": 2,
+      "width": 258,
+      "height": 80,
+      "text": "How to increase AI safety spending for Philanthropic Orgs",
+      "style": "filled"
+    },
+    {
+      "id": 3,
+      "x": -279.1,
+      "y": 140,
+      "width": 328.2,
+      "height": 80,
+      "text": "same USD/grant and larger nbr of grants",
+      "style": "outlined"
+    },
+    {
+      "id": 11,
+      "x": -445,
+      "y": 280,
+      "width": 200,
+      "height": 80,
+      "text": "Head count +",
+      "style": "outlined"
+    },
+    {
+      "id": 12,
+      "x": -215.00000000000003,
+      "y": 280,
+      "width": 200,
+      "height": 80,
+      "text": "Head count neutral approaches",
+      "style": "outlined"
+    },
+    {
+      "id": 13,
+      "x": 14.999999999999972,
+      "y": 280,
+      "width": 200,
+      "height": 80,
+      "text": "Head count -",
+      "style": "outlined"
+    },
+    {
+      "id": 14,
+      "x": -215.00000000000003,
+      "y": 420,
+      "width": 200,
+      "height": 80,
+      "text": "enhance reviewers",
+      "style": "outlined"
+    },
+    {
+      "id": 19,
+      "x": -453,
+      "y": 417,
+      "width": 200,
+      "height": 80,
+      "text": "hire more people",
+      "style": "project"
+    },
+    {
+      "id": 20,
+      "x": 14.999999999999972,
+      "y": 420,
+      "width": 200,
+      "height": 80,
+      "text": "automate people",
+      "style": "rejected"
+    },
+    {
+      "id": 25,
+      "x": -215.00000000000003,
+      "y": 560,
+      "width": 200,
+      "height": 80,
+      "text": "What do reviewers do?",
+      "style": "filled"
+    },
+    {
+      "id": 31,
+      "x": -215.00000000000003,
+      "y": 700,
+      "width": 200,
+      "height": 80,
+      "text": "Epistemics (forming beliefs about quality)",
+      "style": "outlined"
+    },
+    {
+      "id": 32,
+      "x": -445,
+      "y": 700,
+      "width": 200,
+      "height": 80,
+      "text": "Deliberation (debating with comittee about funding decisions)",
+      "style": "outlined"
+    },
+    {
+      "id": 33,
+      "x": 14.999999999999972,
+      "y": 700,
+      "width": 200,
+      "height": 80,
+      "text": "Communication (Externally facing)",
+      "style": "outlined"
+    },
+    {
+      "id": 41,
+      "x": 87.03569817138838,
+      "y": 136.5989864979764,
+      "width": 200,
+      "height": 80,
+      "text": "more USD/grant and same nbr of grants",
+      "style": "outlined"
+    },
+    {
+      "id": 45,
+      "x": 250.81086963915254,
+      "y": 287.11594055028394,
+      "width": 200,
+      "height": 80,
+      "text": "Academic Projects",
+      "style": "outlined"
+    },
+    {
+      "id": 47,
+      "x": 551.8377829926652,
+      "y": 241.24961171762516,
+      "width": 200,
+      "height": 80,
+      "text": "Non-academic Projects",
+      "style": "outlined"
+    },
+    {
+      "id": 49,
+      "x": 261,
+      "y": 422,
+      "width": 200,
+      "height": 80,
+      "text": "Solicit more-multi PI proposals",
+      "style": "project"
+    },
+    {
+      "id": 52,
+      "x": 552.9188914963327,
+      "y": 424,
+      "width": 200,
+      "height": 80,
+      "text": "Fund high-spend non-profits",
+      "style": "project"
+    },
+    {
+      "id": 57,
+      "x": -207.7815174865295,
+      "y": 904.3466024400399,
+      "width": 200,
+      "height": 80,
+      "text": "Contextualization",
+      "style": "project"
+    },
+    {
+      "id": 59,
+      "x": -457.6162814629763,
+      "y": 907.347280026451,
+      "width": 200,
+      "height": 80,
+      "text": "Intake",
+      "style": "project"
+    },
+    {
+      "id": 61,
+      "x": 45.928952499102714,
+      "y": 906.0553780233892,
+      "width": 200,
+      "height": 80,
+      "text": "Evaluation (Scoring)",
+      "style": "rejected"
+    },
+    {
+      "id": 65,
+      "x": -806.826199096658,
+      "y": 651.2252297826933,
+      "width": 200,
+      "height": 80,
+      "text": "Portfolio, high-level view e.g. flagging redundancy, bias",
+      "style": "project"
+    },
+    {
+      "id": 66,
+      "x": -795.8099541924174,
+      "y": 866.474195602371,
+      "width": 200,
+      "height": 80,
+      "text": "Individual, grant-level deliberation",
+      "style": "project"
+    },
+    {
+      "id": 69,
+      "x": 362.75520818224055,
+      "y": 639.4735005554961,
+      "width": 200,
+      "height": 80,
+      "text": "Low-stake one-way comms to applicants e.g. rejection",
+      "style": "project"
+    },
+    {
+      "id": 71,
+      "x": 360.27321636333613,
+      "y": 862.8527642568857,
+      "width": 200,
+      "height": 80,
+      "text": "Complex back and forth with grantees e.g. milestone generation",
+      "style": "rejected"
+    }
+  ],
+  "connectors": [
+    {
+      "id": 10,
+      "sourceId": 1,
+      "targetId": 3,
+      "label": ""
+    },
+    {
+      "id": 16,
+      "sourceId": 3,
+      "targetId": 11,
+      "label": ""
+    },
+    {
+      "id": 17,
+      "sourceId": 3,
+      "targetId": 12,
+      "label": ""
+    },
+    {
+      "id": 18,
+      "sourceId": 3,
+      "targetId": 13,
+      "label": ""
+    },
+    {
+      "id": 22,
+      "sourceId": 13,
+      "targetId": 20,
+      "label": ""
+    },
+    {
+      "id": 23,
+      "sourceId": 12,
+      "targetId": 14,
+      "label": ""
+    },
+    {
+      "id": 24,
+      "sourceId": 11,
+      "targetId": 19,
+      "label": ""
+    },
+    {
+      "id": 30,
+      "sourceId": 14,
+      "targetId": 25,
+      "label": ""
+    },
+    {
+      "id": 35,
+      "sourceId": 25,
+      "targetId": 32,
+      "label": ""
+    },
+    {
+      "id": 37,
+      "sourceId": 25,
+      "targetId": 31,
+      "label": ""
+    },
+    {
+      "id": 38,
+      "sourceId": 25,
+      "targetId": 33,
+      "label": ""
+    },
+    {
+      "id": 43,
+      "sourceId": 1,
+      "targetId": 41,
+      "label": ""
+    },
+    {
+      "id": 44,
+      "sourceId": 41,
+      "targetId": 1,
+      "label": ""
+    },
+    {
+      "id": 46,
+      "sourceId": 41,
+      "targetId": 45,
+      "label": ""
+    },
+    {
+      "id": 48,
+      "sourceId": 41,
+      "targetId": 47,
+      "label": ""
+    },
+    {
+      "id": 51,
+      "sourceId": 45,
+      "targetId": 49,
+      "label": ""
+    },
+    {
+      "id": 53,
+      "sourceId": 47,
+      "targetId": 52,
+      "label": ""
+    },
+    {
+      "id": 62,
+      "sourceId": 31,
+      "targetId": 59,
+      "label": ""
+    },
+    {
+      "id": 63,
+      "sourceId": 31,
+      "targetId": 57,
+      "label": ""
+    },
+    {
+      "id": 64,
+      "sourceId": 31,
+      "targetId": 61,
+      "label": ""
+    },
+    {
+      "id": 67,
+      "sourceId": 32,
+      "targetId": 65,
+      "label": ""
+    },
+    {
+      "id": 68,
+      "sourceId": 32,
+      "targetId": 66,
+      "label": ""
+    },
+    {
+      "id": 70,
+      "sourceId": 33,
+      "targetId": 69,
+      "label": ""
+    },
+    {
+      "id": 72,
+      "sourceId": 33,
+      "targetId": 71,
+      "label": ""
+    }
+  ],
+  "nextId": 74
+}

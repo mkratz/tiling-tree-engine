@@ -1,0 +1,151 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "x": 785.8750000000001,
+      "y": 0,
+      "width": 200,
+      "height": 80,
+      "text": "Secure what part of the cyber system",
+      "style": "filled"
+    },
+    {
+      "id": 2,
+      "x": 259.475,
+      "y": 150,
+      "width": 200,
+      "height": 80,
+      "text": "Update workflows & Infra?",
+      "style": "filled"
+    },
+    {
+      "id": 3,
+      "x": 1092.275,
+      "y": 150,
+      "width": 200,
+      "height": 80,
+      "text": "What trust operation?",
+      "style": "filled"
+    },
+    {
+      "id": 4,
+      "x": 1328.275,
+      "y": 87,
+      "width": 200,
+      "height": 80,
+      "text": "Secure convenient digital identity (a la world coin)",
+      "style": "project"
+    },
+    {
+      "id": 5,
+      "x": 0,
+      "y": 300,
+      "width": 200,
+      "height": 80,
+      "text": "AI red teaming & blue-teaming",
+      "style": "project"
+    },
+    {
+      "id": 7,
+      "x": 249.35000000000002,
+      "y": 300,
+      "width": 200,
+      "height": 80,
+      "text": "Translate to RUST",
+      "style": "project"
+    },
+    {
+      "id": 8,
+      "x": 518.95,
+      "y": 300,
+      "width": 200,
+      "height": 80,
+      "text": "Formal verification of software",
+      "style": "project"
+    },
+    {
+      "id": 14,
+      "x": 1377.8000000000002,
+      "y": 300,
+      "width": 200,
+      "height": 80,
+      "text": "Tamper Security",
+      "style": "project"
+    },
+    {
+      "id": 15,
+      "x": 1099.1000000000001,
+      "y": 300,
+      "width": 200,
+      "height": 80,
+      "text": "Inspection and Validation",
+      "style": "project"
+    },
+    {
+      "id": 16,
+      "x": 806.75,
+      "y": 300,
+      "width": 200,
+      "height": 80,
+      "text": "Make new trustworthy hardware",
+      "style": "project"
+    }
+  ],
+  "connectors": [
+    {
+      "id": 6,
+      "sourceId": 2,
+      "targetId": 5,
+      "label": "Nothing new"
+    },
+    {
+      "id": 9,
+      "sourceId": 2,
+      "targetId": 7,
+      "label": "new workflows, same infra"
+    },
+    {
+      "id": 10,
+      "sourceId": 2,
+      "targetId": 8,
+      "label": "new workflows and infra"
+    },
+    {
+      "id": 11,
+      "sourceId": 1,
+      "targetId": 2,
+      "label": "software"
+    },
+    {
+      "id": 12,
+      "sourceId": 1,
+      "targetId": 3,
+      "label": "hardware"
+    },
+    {
+      "id": 13,
+      "sourceId": 1,
+      "targetId": 4,
+      "label": "Human"
+    },
+    {
+      "id": 17,
+      "sourceId": 3,
+      "targetId": 16,
+      "label": "Make new trustworthy hardware"
+    },
+    {
+      "id": 18,
+      "sourceId": 3,
+      "targetId": 15,
+      "label": "Evaluate things to trust"
+    },
+    {
+      "id": 19,
+      "sourceId": 3,
+      "targetId": 14,
+      "label": "Secure what we trust today"
+    }
+  ],
+  "nextId": 21
+}

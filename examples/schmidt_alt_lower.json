@@ -1,0 +1,397 @@
+{
+  "nodes": [
+    {
+      "id": 1,
+      "x": -114,
+      "y": 2,
+      "width": 258,
+      "height": 80,
+      "text": "How to increase AI safety spending for Philanthropic Orgs",
+      "style": "filled"
+    },
+    {
+      "id": 3,
+      "x": -279.1,
+      "y": 140,
+      "width": 328.2,
+      "height": 80,
+      "text": "same USD/grant and larger nbr of grants",
+      "style": "outlined"
+    },
+    {
+      "id": 11,
+      "x": -445,
+      "y": 280,
+      "width": 200,
+      "height": 80,
+      "text": "Head count +",
+      "style": "outlined"
+    },
+    {
+      "id": 12,
+      "x": -215.00000000000003,
+      "y": 280,
+      "width": 200,
+      "height": 80,
+      "text": "Head count neutral approaches",
+      "style": "outlined"
+    },
+    {
+      "id": 13,
+      "x": 14.999999999999972,
+      "y": 280,
+      "width": 200,
+      "height": 80,
+      "text": "Head count -",
+      "style": "outlined"
+    },
+    {
+      "id": 14,
+      "x": -215.00000000000003,
+      "y": 420,
+      "width": 200,
+      "height": 80,
+      "text": "enhance reviewers",
+      "style": "outlined"
+    },
+    {
+      "id": 19,
+      "x": -453,
+      "y": 417,
+      "width": 200,
+      "height": 80,
+      "text": "hire more people",
+      "style": "project"
+    },
+    {
+      "id": 20,
+      "x": 20.16760801224713,
+      "y": 423.87570600918536,
+      "width": 200,
+      "height": 80,
+      "text": "automate people",
+      "style": "rejected"
+    },
+    {
+      "id": 25,
+      "x": -215.00000000000003,
+      "y": 560,
+      "width": 200,
+      "height": 80,
+      "text": "What do reviewers do?",
+      "style": "filled"
+    },
+    {
+      "id": 31,
+      "x": -215.00000000000003,
+      "y": 700,
+      "width": 200,
+      "height": 80,
+      "text": "Epistemics",
+      "style": "outlined"
+    },
+    {
+      "id": 32,
+      "x": -445,
+      "y": 700,
+      "width": 200,
+      "height": 80,
+      "text": "Deliberation (Internal)",
+      "style": "outlined"
+    },
+    {
+      "id": 33,
+      "x": 14.999999999999972,
+      "y": 700,
+      "width": 200,
+      "height": 80,
+      "text": "Communication (External)",
+      "style": "outlined"
+    },
+    {
+      "id": 41,
+      "x": 87.03569817138838,
+      "y": 136.5989864979764,
+      "width": 200,
+      "height": 80,
+      "text": "more USD/grant and same nbr of grants",
+      "style": "outlined"
+    },
+    {
+      "id": 45,
+      "x": 250.81086963915254,
+      "y": 287.11594055028394,
+      "width": 200,
+      "height": 80,
+      "text": "Academic Projects",
+      "style": "outlined"
+    },
+    {
+      "id": 47,
+      "x": 551.8377829926652,
+      "y": 241.24961171762516,
+      "width": 200,
+      "height": 80,
+      "text": "Non-academic Projects",
+      "style": "outlined"
+    },
+    {
+      "id": 49,
+      "x": 261,
+      "y": 422,
+      "width": 200,
+      "height": 80,
+      "text": "Solicit more-multi PI proposals",
+      "style": "project"
+    },
+    {
+      "id": 52,
+      "x": 552.9188914963327,
+      "y": 424,
+      "width": 200,
+      "height": 80,
+      "text": "Fund high-spend non-profits",
+      "style": "project"
+    },
+    {
+      "id": 73,
+      "x": -370.8715007353899,
+      "y": 895.4664308147934,
+      "width": 200,
+      "height": 80,
+      "text": "Intake (understanding proposal)",
+      "style": "project"
+    },
+    {
+      "id": 74,
+      "x": -124.51316774560826,
+      "y": 892.5907453861333,
+      "width": 200,
+      "height": 80,
+      "text": "Contextualization (relative to field, prior art, portfolio)",
+      "style": "project"
+    },
+    {
+      "id": 75,
+      "x": 136.08831095757432,
+      "y": 888.5285881004634,
+      "width": 200,
+      "height": 87.60000000000001,
+      "text": "Evaluation (is this good, feasible, fundable, novel, etc..)",
+      "style": "rejected"
+    },
+    {
+      "id": 80,
+      "x": -761.7453818619683,
+      "y": 621.4298511119204,
+      "width": 200,
+      "height": 80,
+      "text": "Articulation",
+      "style": "project"
+    },
+    {
+      "id": 81,
+      "x": -757.9940110046484,
+      "y": 761.1995118206765,
+      "width": 200,
+      "height": 80,
+      "text": "Contestation",
+      "style": "outlined"
+    },
+    {
+      "id": 82,
+      "x": -673.3322145793948,
+      "y": 890.4554639562349,
+      "width": 200,
+      "height": 80,
+      "text": "Resolution",
+      "style": "project"
+    },
+    {
+      "id": 86,
+      "x": 351.8470048077722,
+      "y": 571.689447113159,
+      "width": 200,
+      "height": 80,
+      "text": "Recommendation",
+      "style": "rejected"
+    },
+    {
+      "id": 87,
+      "x": 356.8323940835335,
+      "y": 687.4591078219153,
+      "width": 200,
+      "height": 80,
+      "text": "Justification",
+      "style": "project"
+    },
+    {
+      "id": 88,
+      "x": 347.58192537725444,
+      "y": 798.6236459618086,
+      "width": 200,
+      "height": 80,
+      "text": "Feedback",
+      "style": "project"
+    }
+  ],
+  "connectors": [
+    {
+      "id": 10,
+      "sourceId": 1,
+      "targetId": 3,
+      "label": ""
+    },
+    {
+      "id": 16,
+      "sourceId": 3,
+      "targetId": 11,
+      "label": ""
+    },
+    {
+      "id": 17,
+      "sourceId": 3,
+      "targetId": 12,
+      "label": ""
+    },
+    {
+      "id": 18,
+      "sourceId": 3,
+      "targetId": 13,
+      "label": ""
+    },
+    {
+      "id": 22,
+      "sourceId": 13,
+      "targetId": 20,
+      "label": ""
+    },
+    {
+      "id": 23,
+      "sourceId": 12,
+      "targetId": 14,
+      "label": ""
+    },
+    {
+      "id": 24,
+      "sourceId": 11,
+      "targetId": 19,
+      "label": ""
+    },
+    {
+      "id": 30,
+      "sourceId": 14,
+      "targetId": 25,
+      "label": ""
+    },
+    {
+      "id": 35,
+      "sourceId": 25,
+      "targetId": 32,
+      "label": ""
+    },
+    {
+      "id": 37,
+      "sourceId": 25,
+      "targetId": 31,
+      "label": ""
+    },
+    {
+      "id": 38,
+      "sourceId": 25,
+      "targetId": 33,
+      "label": ""
+    },
+    {
+      "id": 43,
+      "sourceId": 1,
+      "targetId": 41,
+      "label": ""
+    },
+    {
+      "id": 44,
+      "sourceId": 41,
+      "targetId": 1,
+      "label": ""
+    },
+    {
+      "id": 46,
+      "sourceId": 41,
+      "targetId": 45,
+      "label": ""
+    },
+    {
+      "id": 48,
+      "sourceId": 41,
+      "targetId": 47,
+      "label": ""
+    },
+    {
+      "id": 51,
+      "sourceId": 45,
+      "targetId": 49,
+      "label": ""
+    },
+    {
+      "id": 53,
+      "sourceId": 47,
+      "targetId": 52,
+      "label": ""
+    },
+    {
+      "id": 77,
+      "sourceId": 31,
+      "targetId": 73,
+      "label": ""
+    },
+    {
+      "id": 78,
+      "sourceId": 31,
+      "targetId": 74,
+      "label": ""
+    },
+    {
+      "id": 79,
+      "sourceId": 31,
+      "targetId": 75,
+      "label": ""
+    },
+    {
+      "id": 83,
+      "sourceId": 32,
+      "targetId": 80,
+      "label": ""
+    },
+    {
+      "id": 84,
+      "sourceId": 32,
+      "targetId": 81,
+      "label": ""
+    },
+    {
+      "id": 85,
+      "sourceId": 32,
+      "targetId": 82,
+      "label": ""
+    },
+    {
+      "id": 89,
+      "sourceId": 33,
+      "targetId": 88,
+      "label": ""
+    },
+    {
+      "id": 90,
+      "sourceId": 33,
+      "targetId": 87,
+      "label": ""
+    },
+    {
+      "id": 91,
+      "sourceId": 33,
+      "targetId": 86,
+      "label": ""
+    }
+  ],
+  "nextId": 95
+}
