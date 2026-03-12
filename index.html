@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiling Decision Tree Engine</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #e0e0e0; }
+  #toolbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; gap: 6px; padding: 8px 12px;
+    background: #fff; border-bottom: 1px solid #ccc; box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  #toolbar button {
+    padding: 6px 14px; border: 1px solid #bbb; border-radius: 4px;
+    background: #fafafa; cursor: pointer; font-size: 13px; color: #333;
+  }
+  #toolbar button:hover { background: #eee; }
+  #file-input { display: none; }
+  svg#canvas { display: block; width: 100vw; height: 100vh; cursor: default; }
+  #hud {
+    position: fixed; bottom: 16px; right: 16px; z-index: 10;
+    background: rgba(30,30,30,0.88); color: #ddd; padding: 14px 18px;
+    border-radius: 8px; font-size: 12px; line-height: 1.7;
+    display: none; max-width: 320px; pointer-events: none;
+  }
+  #hud h3 { color: #fff; margin-bottom: 6px; font-size: 13px; }
+  #hud kbd {
+    display: inline-block; background: rgba(255,255,255,0.15); padding: 1px 5px;
+    border-radius: 3px; font-family: monospace; font-size: 11px;
+  }
+  #load-dialog {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 20; background: rgba(0,0,0,0.4);
+    justify-content: center; align-items: center;
+  }
+  #load-dialog.visible { display: flex; }
+  #load-dialog-inner {
+    background: #fff; border-radius: 8px; padding: 20px; min-width: 260px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  #load-dialog-inner h3 { margin-bottom: 10px; font-size: 14px; color: #333; }
+  #load-dialog-inner .figure-item {
+    display: block; width: 100%; text-align: left; padding: 8px 12px;
+    border: 1px solid #ddd; border-radius: 4px; margin-bottom: 6px;
+    background: #fafafa; cursor: pointer; font-size: 13px; color: #333;
+  }
+  #load-dialog-inner .figure-item:hover { background: #e8f0fe; border-color: #4a90d9; }
+  #load-dialog-inner .close-btn {
+    margin-top: 8px; padding: 6px 14px; border: 1px solid #bbb;
+    border-radius: 4px; background: #fafafa; cursor: pointer; font-size: 13px;
+  }
+  #legend {
+    position: fixed; bottom: 16px; left: 16px; z-index: 10;
+    background: rgba(255,255,255,0.92); padding: 10px 14px;
+    border-radius: 6px; font-size: 12px; line-height: 1.8;
+    border: 1px solid #ccc; pointer-events: none;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-swatch {
+    width: 14px; height: 14px; border-radius: 3px; border: 1px solid #999;
+    flex-shrink: 0;
+  }
+  .editing-textarea {
+    width: 100%; height: 100%; border: none; outline: none;
+    resize: none; background: transparent; font-family: inherit;
+    font-size: 13px; text-align: center; padding: 8px;
+    overflow: hidden; line-height: 1.3;
+  }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <button id="btn-layout">Pretty Layout</button>
+  <button id="btn-compact">Compact Layout</button>
+  <button id="btn-save">Save</button>
+  <button id="btn-save-as">Save As</button>
+  <button id="btn-load">Load</button>
+  <button id="btn-export">Export SVG</button>
+  <button id="btn-hud">HUD (H)</button>
+</div>
+<input type="file" id="file-input" accept=".json">
+
+<svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200%" height="200%" x="-50%" y="-50%" fill="#f5f5f5"/>
+  <g id="world">
+    <g id="connectors-layer"></g>
+    <g id="nodes-layer"></g>
+    <g id="labels-layer"></g>
+  </g>
+</svg>
+
+<div id="hud">
+  <h3>Keyboard Shortcuts</h3>
+  <div><kbd>Click</kbd> canvas — create node</div>
+  <div><kbd>Click</kbd> node — select (then click another to connect)</div>
+  <div><kbd>Double-click</kbd> node — edit text</div>
+  <div><kbd>Right-click</kbd> node — cycle color (idea/question/viable/non-viable)</div>
+  <div><kbd>Delete</kbd> / <kbd>Backspace</kbd> — remove selected</div>
+  <div><kbd>Ctrl+Z</kbd> — undo</div>
+  <div><kbd>Ctrl+Shift+Z</kbd> — redo</div>
+  <div><kbd>Escape</kbd> — cancel / deselect</div>
+  <div><kbd>Scroll</kbd> — zoom in/out</div>
+  <div><kbd>Drag</kbd> canvas — pan</div>
+  <div><kbd>Drag</kbd> node — move</div>
+  <div><kbd>Click</kbd> connector — edit label</div>
+  <div><kbd>H</kbd> — toggle this HUD</div>
+</div>
+
+<div id="legend">
+  <div class="legend-item"><div class="legend-swatch" style="background:#ffffff"></div> Idea</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#2e7d32"></div> Question</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#1a3a6b"></div> Viable solution</div>
+  <div class="legend-item"><div class="legend-swatch" style="background:#c0392b"></div> Non-viable</div>
+</div>
+
+<div id="load-dialog">
+  <div id="load-dialog-inner">
+    <h3>Load Figure</h3>
+    <div id="load-dialog-list"></div>
+    <button class="close-btn" id="load-dialog-close">Cancel</button>
+  </div>
+</div>
+
+<script>
+// ── Data Model ───────────────────────────────────────────
+let nodes = [];
+let connectors = [];
+let nextId = 1;
+
+// ── App State ────────────────────────────────────────────
+let selectedId = null;
+let selectedType = null; // 'node' | 'connector'
+let connectingFrom = null;
+let editingNode = null;
+let viewTransform = { x: 0, y: 0, scale: 1 };
+
+// ── Undo/Redo ────────────────────────────────────────────
+let undoStack = [];
+let redoStack = [];
+const MAX_UNDO = 100;
+
+function saveSnapshot() {
+  undoStack.push(JSON.stringify({ nodes, connectors, nextId }));
+  if (undoStack.length > MAX_UNDO) undoStack.shift();
+  redoStack = [];
+}
+
+function undo() {
+  if (undoStack.length === 0) return;
+  redoStack.push(JSON.stringify({ nodes, connectors, nextId }));
+  const snap = JSON.parse(undoStack.pop());
+  nodes = snap.nodes; connectors = snap.connectors; nextId = snap.nextId;
+  selectedId = null; selectedType = null; connectingFrom = null; editingNode = null;
+  renderAll();
+}
+
+function redo() {
+  if (redoStack.length === 0) return;
+  undoStack.push(JSON.stringify({ nodes, connectors, nextId }));
+  const snap = JSON.parse(redoStack.pop());
+  nodes = snap.nodes; connectors = snap.connectors; nextId = snap.nextId;
+  selectedId = null; selectedType = null; connectingFrom = null; editingNode = null;
+  renderAll();
+}
+
+// ── Pointer State Machine ────────────────────────────────
+let pointerState = 'idle'; // idle | maybe-drag | maybe-pan | dragging | panning
+let pointerStart = { x: 0, y: 0 };
+let dragNodeId = null;
+let dragNodeStart = { x: 0, y: 0 };
+const DRAG_THRESHOLD = 4;
+let lastClickTime = 0;
+let lastClickNodeId = null;
+
+// ── DOM refs ─────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const world = document.getElementById('world');
+const nodesLayer = document.getElementById('nodes-layer');
+const connectorsLayer = document.getElementById('connectors-layer');
+const labelsLayer = document.getElementById('labels-layer');
+const hud = document.getElementById('hud');
+const fileInput = document.getElementById('file-input');
+
+// ── Helpers ──────────────────────────────────────────────
+function screenToWorld(sx, sy) {
+  return {
+    x: (sx - viewTransform.x) / viewTransform.scale,
+    y: (sy - viewTransform.y) / viewTransform.scale
+  };
+}
+
+function findNode(id) { return nodes.find(n => n.id === id); }
+function findConnector(id) { return connectors.find(c => c.id === id); }
+
+function wrapText(text, maxWidth, fontSize) {
+  const charWidth = fontSize * 0.6;
+  const maxChars = Math.floor((maxWidth - 24) / charWidth);
+  const wrapped = [];
+  for (const line of text.split('\n')) {
+    if (line.length === 0) { wrapped.push(''); continue; }
+    const words = line.split(' ');
+    let cur = '';
+    for (const word of words) {
+      const test = cur ? cur + ' ' + word : word;
+      if (test.length > maxChars && cur) {
+        wrapped.push(cur);
+        cur = word;
+      } else {
+        cur = test;
+      }
+    }
+    if (cur) wrapped.push(cur);
+  }
+  return wrapped;
+}
+
+function measureText(text, fontSize, fixedWidth) {
+  const width = fixedWidth || 200;
+  const lines = wrapText(text, width, fontSize);
+  const lineHeight = fontSize * 1.3;
+  const height = Math.max(80, lines.length * lineHeight + 20);
+  return { width, height };
+}
+
+// ── Render ───────────────────────────────────────────────
+function renderAll() {
+  world.setAttribute('transform',
+    `translate(${viewTransform.x},${viewTransform.y}) scale(${viewTransform.scale})`);
+  renderConnectors();
+  renderNodes();
+}
+
+function renderNodes() {
+  nodesLayer.innerHTML = '';
+  for (const node of nodes) {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('data-node-id', node.id);
+    g.setAttribute('transform', `translate(${node.x},${node.y})`);
+
+    const style = node.style || 'outlined';
+    const fillColor = { outlined: '#ffffff', filled: '#2e7d32', project: '#1a3a6b', rejected: '#c0392b' }[style] || '#ffffff';
+    const textColor = style === 'outlined' ? '#333333' : '#ffffff';
+    const isSelected = selectedType === 'node' && selectedId === node.id;
+    const isConnecting = connectingFrom === node.id;
+
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('width', node.width);
+    rect.setAttribute('height', node.height);
+    rect.setAttribute('rx', '6');
+    rect.setAttribute('ry', '6');
+    rect.setAttribute('fill', fillColor);
+    rect.setAttribute('stroke',
+      isConnecting ? '#e67e22' : isSelected ? '#4a90d9' : '#555');
+    rect.setAttribute('stroke-width', isSelected || isConnecting ? '2' : '1.5');
+    g.appendChild(rect);
+
+    if (editingNode === node.id) {
+      const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      fo.setAttribute('x', '0');
+      fo.setAttribute('y', '0');
+      fo.setAttribute('width', node.width);
+      fo.setAttribute('height', node.height);
+      const ta = document.createElement('textarea');
+      ta.className = 'editing-textarea';
+      ta.value = node.text;
+      ta.style.color = textColor;
+      fo.appendChild(ta);
+      g.appendChild(fo);
+
+      setTimeout(() => {
+        ta.focus();
+        ta.select();
+      }, 0);
+
+      ta.addEventListener('blur', () => finishEditing(node.id, ta.value));
+      ta.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { ta.blur(); }
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ta.blur(); }
+        e.stopPropagation();
+      });
+      ta.addEventListener('mousedown', (e) => e.stopPropagation());
+      ta.addEventListener('dblclick', (e) => e.stopPropagation());
+    } else {
+      const lines = wrapText(node.text, node.width, 13);
+      const lineHeight = 15;
+      const totalHeight = lines.length * lineHeight;
+      const startY = (node.height - totalHeight) / 2 + lineHeight * 0.75;
+
+      for (let i = 0; i < lines.length; i++) {
+        const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        txt.setAttribute('x', node.width / 2);
+        txt.setAttribute('y', startY + i * lineHeight);
+        txt.setAttribute('text-anchor', 'middle');
+        txt.setAttribute('font-family', "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif");
+        txt.setAttribute('font-size', '13');
+        txt.setAttribute('fill', textColor);
+        txt.setAttribute('pointer-events', 'none');
+        txt.textContent = lines[i] || ' ';
+        g.appendChild(txt);
+      }
+    }
+
+    nodesLayer.appendChild(g);
+  }
+}
+
+function renderConnectors() {
+  connectorsLayer.innerHTML = '';
+  labelsLayer.innerHTML = '';
+  for (const conn of connectors) {
+    const src = findNode(conn.sourceId);
+    const tgt = findNode(conn.targetId);
+    if (!src || !tgt) continue;
+
+    // Smart anchor selection based on relative positions
+    const srcCx = src.x + src.width / 2;
+    const srcCy = src.y + src.height / 2;
+    const tgtCx = tgt.x + tgt.width / 2;
+    const tgtCy = tgt.y + tgt.height / 2;
+    const dx = tgtCx - srcCx;
+    const dy = tgtCy - srcCy;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    let sx, sy, tx, ty, c1x, c1y, c2x, c2y;
+
+    if (absDy > absDx * 0.5 && dy > 0) {
+      // Target clearly below: bottom → top
+      sx = srcCx; sy = src.y + src.height;
+      tx = tgtCx; ty = tgt.y;
+      const cp = Math.max(50, (ty - sy) * 0.5 + absDx * 0.25);
+      c1x = sx; c1y = sy + cp;
+      c2x = tx; c2y = ty - cp;
+    } else if (absDy > absDx * 0.5 && dy < 0) {
+      // Target clearly above: top → bottom
+      sx = srcCx; sy = src.y;
+      tx = tgtCx; ty = tgt.y + tgt.height;
+      const cp = Math.max(50, (sy - ty) * 0.5 + absDx * 0.25);
+      c1x = sx; c1y = sy - cp;
+      c2x = tx; c2y = ty + cp;
+    } else if (dx > 0) {
+      // Target to the right: right → left
+      sx = src.x + src.width; sy = srcCy;
+      tx = tgt.x; ty = tgtCy;
+      const cp = Math.max(50, absDx * 0.4);
+      const vOff = dy * 0.3;
+      c1x = sx + cp; c1y = sy + vOff;
+      c2x = tx - cp; c2y = ty - vOff;
+    } else {
+      // Target to the left: left → right
+      sx = src.x; sy = srcCy;
+      tx = tgt.x + tgt.width; ty = tgtCy;
+      const cp = Math.max(50, absDx * 0.4);
+      const vOff = dy * 0.3;
+      c1x = sx - cp; c1y = sy + vOff;
+      c2x = tx + cp; c2y = ty - vOff;
+    }
+
+    const pathD = `M ${sx},${sy} C ${c1x},${c1y} ${c2x},${c2y} ${tx},${ty}`;
+
+    const isSelected = selectedType === 'connector' && selectedId === conn.id;
+
+    // Invisible hit target
+    const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    hitPath.setAttribute('d', pathD);
+    hitPath.setAttribute('stroke', 'transparent');
+    hitPath.setAttribute('stroke-width', '12');
+    hitPath.setAttribute('fill', 'none');
+    hitPath.setAttribute('data-connector-id', conn.id);
+    hitPath.style.cursor = 'pointer';
+    connectorsLayer.appendChild(hitPath);
+
+    // Visible path
+    const visPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    visPath.setAttribute('d', pathD);
+    visPath.setAttribute('stroke', isSelected ? '#4a90d9' : '#888');
+    visPath.setAttribute('stroke-width', isSelected ? '2.5' : '1.5');
+    visPath.setAttribute('fill', 'none');
+    visPath.setAttribute('pointer-events', 'none');
+    connectorsLayer.appendChild(visPath);
+
+    // Arrowhead
+    const angle = Math.atan2(ty - c2y, tx - c2x);
+    const arrowSize = 8;
+    const ax1 = tx - arrowSize * Math.cos(angle - 0.4);
+    const ay1 = ty - arrowSize * Math.sin(angle - 0.4);
+    const ax2 = tx - arrowSize * Math.cos(angle + 0.4);
+    const ay2 = ty - arrowSize * Math.sin(angle + 0.4);
+    const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    arrow.setAttribute('points', `${tx},${ty} ${ax1},${ay1} ${ax2},${ay2}`);
+    arrow.setAttribute('fill', isSelected ? '#4a90d9' : '#888');
+    arrow.setAttribute('pointer-events', 'none');
+    connectorsLayer.appendChild(arrow);
+
+    // Label — position along bezier at t=0.7 (near target, where paths diverge)
+    if (conn.label) {
+      const t = 0.7;
+      const mt = 1 - t;
+      const mx = mt*mt*mt*sx + 3*mt*mt*t*c1x + 3*mt*t*t*c2x + t*t*t*tx;
+      const my = mt*mt*mt*sy + 3*mt*mt*t*c1y + 3*mt*t*t*c2y + t*t*t*ty;
+      const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const labelW = conn.label.length * 7 + 12;
+      labelBg.setAttribute('x', mx - labelW / 2);
+      labelBg.setAttribute('y', my - 10);
+      labelBg.setAttribute('width', labelW);
+      labelBg.setAttribute('height', 20);
+      labelBg.setAttribute('rx', '3');
+      labelBg.setAttribute('fill', '#fff');
+      labelBg.setAttribute('stroke', '#ccc');
+      labelBg.setAttribute('stroke-width', '1');
+      labelBg.setAttribute('pointer-events', 'none');
+      labelsLayer.appendChild(labelBg);
+
+      const labelTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      labelTxt.setAttribute('x', mx);
+      labelTxt.setAttribute('y', my + 4);
+      labelTxt.setAttribute('text-anchor', 'middle');
+      labelTxt.setAttribute('font-family', "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif");
+      labelTxt.setAttribute('font-size', '11');
+      labelTxt.setAttribute('fill', '#555');
+      labelTxt.setAttribute('pointer-events', 'none');
+      labelTxt.textContent = conn.label;
+      labelsLayer.appendChild(labelTxt);
+    }
+  }
+}
+
+// ── Node Creation ────────────────────────────────────────
+function createNode(wx, wy) {
+  saveSnapshot();
+  const node = {
+    id: nextId++,
+    x: wx - 100,
+    y: wy - 40,
+    width: 200,
+    height: 80,
+    text: '',
+    style: 'outlined'
+  };
+  nodes.push(node);
+  selectedId = null;
+  selectedType = null;
+  connectingFrom = null;
+  startEditing(node.id);
+  return node;
+}
+
+// ── Editing ──────────────────────────────────────────────
+function startEditing(nodeId) {
+  if (editingNode) finishEditingCurrent();
+  editingNode = nodeId;
+  renderAll();
+}
+
+function finishEditing(nodeId, newText) {
+  const node = findNode(nodeId);
+  if (!node) return;
+  saveSnapshot();
+  node.text = newText || 'Node';
+  const size = measureText(node.text, 13, node.width);
+  node.height = size.height;
+  editingNode = null;
+  renderAll();
+}
+
+function finishEditingCurrent() {
+  if (editingNode) {
+    const ta = document.querySelector('.editing-textarea');
+    if (ta) finishEditing(editingNode, ta.value);
+    else editingNode = null;
+  }
+}
+
+// ── Selection ────────────────────────────────────────────
+function selectNode(id) {
+  selectedId = id;
+  selectedType = 'node';
+  renderAll();
+}
+
+function selectConnector(id) {
+  selectedId = id;
+  selectedType = 'connector';
+  connectingFrom = null;
+  renderAll();
+}
+
+function deselect() {
+  selectedId = null;
+  selectedType = null;
+  connectingFrom = null;
+  renderAll();
+}
+
+// ── Deletion ─────────────────────────────────────────────
+function deleteSelected() {
+  if (!selectedId) return;
+  saveSnapshot();
+  if (selectedType === 'node') {
+    connectors = connectors.filter(c => c.sourceId !== selectedId && c.targetId !== selectedId);
+    nodes = nodes.filter(n => n.id !== selectedId);
+  } else if (selectedType === 'connector') {
+    connectors = connectors.filter(c => c.id !== selectedId);
+  }
+  selectedId = null;
+  selectedType = null;
+  connectingFrom = null;
+  renderAll();
+}
+
+// ── Connecting ───────────────────────────────────────────
+function handleNodeClick(nodeId) {
+  if (connectingFrom !== null) {
+    if (connectingFrom !== nodeId) {
+      // Check for duplicate connector
+      const exists = connectors.some(c =>
+        c.sourceId === connectingFrom && c.targetId === nodeId);
+      if (!exists) {
+        saveSnapshot();
+        connectors.push({
+          id: nextId++,
+          sourceId: connectingFrom,
+          targetId: nodeId,
+          label: ''
+        });
+      }
+    }
+    connectingFrom = null;
+    selectNode(nodeId);
+  } else {
+    selectNode(nodeId);
+    connectingFrom = nodeId;
+  }
+}
+
+// ── Pointer Events ───────────────────────────────────────
+canvas.addEventListener('mousedown', (e) => {
+  if (e.button !== 0) return;
+  if (editingNode) {
+    const ta = e.target.closest('.editing-textarea');
+    if (ta) return;
+    finishEditingCurrent();
+    pointerState = 'idle';
+    return;
+  }
+
+  pointerStart = { x: e.clientX, y: e.clientY };
+
+  const nodeEl = e.target.closest('[data-node-id]');
+  if (nodeEl) {
+    dragNodeId = parseInt(nodeEl.getAttribute('data-node-id'));
+    const node = findNode(dragNodeId);
+    if (node) {
+      dragNodeStart = { x: node.x, y: node.y };
+      pointerState = 'maybe-drag';
+    }
+    return;
+  }
+
+  const connEl = e.target.closest('[data-connector-id]');
+  if (connEl) {
+    const connId = parseInt(connEl.getAttribute('data-connector-id'));
+    if (selectedType === 'connector' && selectedId === connId) {
+      // Already selected — edit label
+      const conn = findConnector(connId);
+      if (conn) {
+        const label = prompt('Connector label:', conn.label || '');
+        if (label !== null) {
+          saveSnapshot();
+          conn.label = label;
+          renderAll();
+        }
+      }
+    } else {
+      selectConnector(connId);
+    }
+    return;
+  }
+
+  pointerState = 'maybe-pan';
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  if (pointerState === 'idle') return;
+
+  const dx = e.clientX - pointerStart.x;
+  const dy = e.clientY - pointerStart.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  if (pointerState === 'maybe-drag' && dist > DRAG_THRESHOLD) {
+    saveSnapshot();
+    pointerState = 'dragging';
+    canvas.style.cursor = 'grabbing';
+  }
+
+  if (pointerState === 'maybe-pan' && dist > DRAG_THRESHOLD) {
+    pointerState = 'panning';
+    canvas.style.cursor = 'grabbing';
+  }
+
+  if (pointerState === 'dragging' && dragNodeId !== null) {
+    const node = findNode(dragNodeId);
+    if (node) {
+      node.x = dragNodeStart.x + dx / viewTransform.scale;
+      node.y = dragNodeStart.y + dy / viewTransform.scale;
+      renderAll();
+    }
+  }
+
+  if (pointerState === 'panning') {
+    viewTransform.x += e.movementX;
+    viewTransform.y += e.movementY;
+    renderAll();
+  }
+});
+
+canvas.addEventListener('mouseup', (e) => {
+  if (e.button !== 0) return;
+
+  if (pointerState === 'maybe-drag' && dragNodeId !== null) {
+    const now = Date.now();
+    if (lastClickNodeId === dragNodeId && now - lastClickTime < 350) {
+      // Double-click detected
+      connectingFrom = null;
+      startEditing(dragNodeId);
+      lastClickNodeId = null;
+      lastClickTime = 0;
+    } else {
+      handleNodeClick(dragNodeId);
+      lastClickNodeId = dragNodeId;
+      lastClickTime = now;
+    }
+  }
+
+  if (pointerState === 'maybe-pan') {
+    if (connectingFrom !== null || selectedId !== null) {
+      // Cancel connecting mode / deselect
+      connectingFrom = null;
+      selectedId = null;
+      selectedType = null;
+      renderAll();
+    } else {
+      // Click on empty canvas — create node
+      const wp = screenToWorld(e.clientX, e.clientY);
+      createNode(wp.x, wp.y);
+    }
+  }
+
+  pointerState = 'idle';
+  dragNodeId = null;
+  canvas.style.cursor = 'default';
+});
+
+// ── Right-Click (Style Toggle) ───────────────────────────
+canvas.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  const nodeEl = e.target.closest('[data-node-id]');
+  if (nodeEl) {
+    const nodeId = parseInt(nodeEl.getAttribute('data-node-id'));
+    const node = findNode(nodeId);
+    if (node) {
+      saveSnapshot();
+      const cycle = { outlined: 'filled', filled: 'project', project: 'rejected', rejected: 'outlined' };
+      node.style = cycle[node.style] || 'filled';
+      renderAll();
+    }
+  }
+});
+
+
+// ── Zoom ─────────────────────────────────────────────────
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.1 : 0.9;
+  const newScale = Math.max(0.1, Math.min(5, viewTransform.scale * factor));
+  const ratio = newScale / viewTransform.scale;
+
+  viewTransform.x = e.clientX - (e.clientX - viewTransform.x) * ratio;
+  viewTransform.y = e.clientY - (e.clientY - viewTransform.y) * ratio;
+  viewTransform.scale = newScale;
+  renderAll();
+}, { passive: false });
+
+// ── Keyboard ─────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+    e.preventDefault(); undo(); return;
+  }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
+    e.preventDefault(); redo(); return;
+  }
+  if (editingNode) return;
+
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    deleteSelected();
+    e.preventDefault();
+  }
+  if (e.key === 'Escape') {
+    finishEditingCurrent();
+    deselect();
+  }
+  if (e.key === 'h' || e.key === 'H') {
+    toggleHud();
+  }
+});
+
+// ── HUD ──────────────────────────────────────────────────
+function toggleHud() {
+  hud.style.display = hud.style.display === 'block' ? 'none' : 'block';
+}
+
+// ── Layout helpers ───────────────────────────────────────
+// Effective width: accounts for incoming connector label width
+function layoutWidth(nodeId) {
+  const node = findNode(nodeId);
+  let w = node.width;
+  for (const c of connectors) {
+    if (c.targetId === nodeId && c.label) {
+      const labelW = c.label.length * 7 + 24;
+      w = Math.max(w, labelW * 1.3); // 1.3x because label is at t=0.7, not at child
+    }
+  }
+  return w;
+}
+
+// ── Auto-Layout ──────────────────────────────────────────
+function autoLayout() {
+  if (nodes.length === 0) return;
+  saveSnapshot();
+
+  const NODE_H_SEP = 40;
+  const NODE_V_SEP = 100;
+
+  // Step 1: Build adjacency from connectors
+  const adjChildren = {};
+  const hasParent = new Set();
+  for (const c of connectors) {
+    if (!adjChildren[c.sourceId]) adjChildren[c.sourceId] = [];
+    adjChildren[c.sourceId].push(c.targetId);
+    hasParent.add(c.targetId);
+  }
+
+  // Step 2: Find roots (no incoming edges)
+  let roots = nodes.filter(n => !hasParent.has(n.id)).map(n => n.id);
+  if (roots.length === 0) roots = [nodes[0].id];
+
+  // Step 3: Build clean tree (each node assigned to one parent, breaks cycles)
+  const treeKids = {};
+  const visited = new Set();
+
+  function buildTree(id) {
+    visited.add(id);
+    treeKids[id] = [];
+    for (const cid of (adjChildren[id] || [])) {
+      if (!visited.has(cid) && findNode(cid)) {
+        treeKids[id].push(cid);
+        buildTree(cid);
+      }
+    }
+  }
+
+  for (const rid of roots) {
+    if (!visited.has(rid)) buildTree(rid);
+  }
+  // Disconnected nodes become their own roots
+  for (const n of nodes) {
+    if (!visited.has(n.id)) {
+      roots.push(n.id);
+      buildTree(n.id);
+    }
+  }
+
+  // Step 4: Compute subtree widths bottom-up (no visited dependency)
+  const stWidth = {};
+  function computeWidth(id) {
+    const kids = treeKids[id] || [];
+    if (kids.length === 0) {
+      stWidth[id] = layoutWidth(id);
+      return stWidth[id];
+    }
+    let w = 0;
+    for (let i = 0; i < kids.length; i++) {
+      if (i > 0) w += NODE_H_SEP;
+      w += computeWidth(kids[i]);
+    }
+    stWidth[id] = Math.max(layoutWidth(id), w);
+    return stWidth[id];
+  }
+
+  // Step 5: Compute per-depth row heights
+  const depthMaxH = {};
+  function computeDepths(id, depth) {
+    const h = findNode(id).height;
+    depthMaxH[depth] = Math.max(depthMaxH[depth] || 0, h);
+    for (const kid of (treeKids[id] || [])) {
+      computeDepths(kid, depth + 1);
+    }
+  }
+
+  // Step 6: Assign positions top-down
+  const finalX = {};
+  const finalY = {};
+
+  function assignPos(id, depth, centerX) {
+    finalX[id] = centerX;
+
+    // Y = sum of all row heights above + separations
+    let y = 0;
+    for (let d = 0; d < depth; d++) {
+      y += (depthMaxH[d] || 0) + NODE_V_SEP;
+    }
+    finalY[id] = y;
+
+    const kids = treeKids[id] || [];
+    if (kids.length === 0) return;
+
+    let totalW = 0;
+    for (let i = 0; i < kids.length; i++) {
+      if (i > 0) totalW += NODE_H_SEP;
+      totalW += stWidth[kids[i]];
+    }
+
+    let x = centerX - totalW / 2;
+    for (const kid of kids) {
+      const w = stWidth[kid];
+      assignPos(kid, depth + 1, x + w / 2);
+      x += w + NODE_H_SEP;
+    }
+  }
+
+  // Layout each tree in the forest side by side
+  let forestX = 0;
+  for (const rid of roots) {
+    computeWidth(rid);
+    computeDepths(rid, 0);
+  }
+  for (const rid of roots) {
+    const w = stWidth[rid];
+    assignPos(rid, 0, forestX + w / 2);
+    forestX += w + 60;
+  }
+
+  // Apply positions
+  for (const node of nodes) {
+    if (finalX[node.id] !== undefined) {
+      node.x = finalX[node.id] - node.width / 2;
+      node.y = finalY[node.id];
+    }
+  }
+
+  // Center the view
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const n of nodes) {
+    minX = Math.min(minX, n.x);
+    minY = Math.min(minY, n.y);
+    maxX = Math.max(maxX, n.x + n.width);
+    maxY = Math.max(maxY, n.y + n.height);
+  }
+  const cx = (minX + maxX) / 2;
+  const cy = (minY + maxY) / 2;
+  viewTransform.scale = 1;
+  viewTransform.x = window.innerWidth / 2 - cx;
+  viewTransform.y = window.innerHeight / 2 - cy;
+
+  renderAll();
+}
+
+// ── Compact Layout (contour-based) ───────────────────────
+function compactLayout() {
+  if (nodes.length === 0) return;
+  saveSnapshot();
+
+  const H_SEP = 20;
+  const V_SEP = 70;
+
+  // Build adjacency
+  const adjChildren = {};
+  const hasParent = new Set();
+  for (const c of connectors) {
+    if (!adjChildren[c.sourceId]) adjChildren[c.sourceId] = [];
+    adjChildren[c.sourceId].push(c.targetId);
+    hasParent.add(c.targetId);
+  }
+
+  let roots = nodes.filter(n => !hasParent.has(n.id)).map(n => n.id);
+  if (roots.length === 0) roots = [nodes[0].id];
+
+  // Build clean tree
+  const treeKids = {};
+  const visited = new Set();
+  function buildTree(id) {
+    visited.add(id);
+    treeKids[id] = [];
+    for (const cid of (adjChildren[id] || [])) {
+      if (!visited.has(cid) && findNode(cid)) {
+        treeKids[id].push(cid);
+        buildTree(cid);
+      }
+    }
+  }
+  for (const rid of roots) {
+    if (!visited.has(rid)) buildTree(rid);
+  }
+  for (const n of nodes) {
+    if (!visited.has(n.id)) { roots.push(n.id); buildTree(n.id); }
+  }
+
+  // Per-depth row heights
+  const depthMaxH = {};
+  function computeDepths(id, depth) {
+    depthMaxH[depth] = Math.max(depthMaxH[depth] || 0, findNode(id).height);
+    for (const kid of treeKids[id]) computeDepths(kid, depth + 1);
+  }
+  for (const rid of roots) computeDepths(rid, 0);
+
+  // Contour-based layout
+  // Returns { left: number[], right: number[] } — contours relative to node center
+  // left[d]/right[d] = leftmost/rightmost x at depth d (0 = this node's level)
+  const childOffsets = {}; // nodeId → offset array for its children
+
+  function layout(id) {
+    const hw = layoutWidth(id) / 2;
+    const kids = treeKids[id];
+
+    if (kids.length === 0) {
+      return { left: [-hw], right: [hw] };
+    }
+
+    const kidResults = kids.map(kid => layout(kid));
+
+    // Place children left-to-right, packing tightly via contour comparison
+    const pos = [0]; // child positions relative to child-0's center
+    let mRight = kidResults[0].right.slice();
+    let mLeft = kidResults[0].left.slice();
+
+    for (let i = 1; i < kids.length; i++) {
+      const kr = kidResults[i];
+      let shift = 0;
+      const maxD = Math.min(mRight.length, kr.left.length);
+      for (let d = 0; d < maxD; d++) {
+        shift = Math.max(shift, mRight[d] - kr.left[d] + H_SEP);
+      }
+      if (maxD === 0) shift = H_SEP;
+      pos[i] = shift;
+
+      // Merge right contour
+      const newR = [];
+      for (let d = 0; d < Math.max(mRight.length, kr.right.length); d++) {
+        const fromOld = d < mRight.length ? mRight[d] : -Infinity;
+        const fromNew = d < kr.right.length ? pos[i] + kr.right[d] : -Infinity;
+        newR[d] = Math.max(fromOld, fromNew);
+      }
+      mRight = newR;
+
+      // Extend left contour where new child goes deeper
+      for (let d = mLeft.length; d < kr.left.length; d++) {
+        mLeft[d] = pos[i] + kr.left[d];
+      }
+    }
+
+    // Center parent over first and last child
+    const mid = (pos[0] + pos[pos.length - 1]) / 2;
+    childOffsets[id] = pos.map(p => p - mid);
+
+    // Return contours relative to parent center
+    const left = [-hw];
+    const right = [hw];
+    for (let d = 0; d < mLeft.length; d++) left.push(mLeft[d] - mid);
+    for (let d = 0; d < mRight.length; d++) right.push(mRight[d] - mid);
+    return { left, right };
+  }
+
+  // Assign absolute positions
+  const finalX = {};
+  const finalY = {};
+
+  function assign(id, absX, depth) {
+    finalX[id] = absX;
+    let y = 0;
+    for (let d = 0; d < depth; d++) y += (depthMaxH[d] || 0) + V_SEP;
+    finalY[id] = y;
+    const offsets = childOffsets[id];
+    if (offsets) {
+      const kids = treeKids[id];
+      for (let i = 0; i < kids.length; i++) {
+        assign(kids[i], absX + offsets[i], depth + 1);
+      }
+    }
+  }
+
+  // Layout forest side by side
+  let forestX = 0;
+  for (const rid of roots) {
+    const result = layout(rid);
+    let minL = 0, maxR = 0;
+    for (const v of result.left) minL = Math.min(minL, v);
+    for (const v of result.right) maxR = Math.max(maxR, v);
+    assign(rid, forestX - minL, 0);
+    forestX += (maxR - minL) + 60;
+  }
+
+  // Apply
+  for (const node of nodes) {
+    if (finalX[node.id] !== undefined) {
+      node.x = finalX[node.id] - node.width / 2;
+      node.y = finalY[node.id];
+    }
+  }
+
+  // Center view
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const n of nodes) {
+    minX = Math.min(minX, n.x); minY = Math.min(minY, n.y);
+    maxX = Math.max(maxX, n.x + n.width); maxY = Math.max(maxY, n.y + n.height);
+  }
+  viewTransform.scale = 1;
+  viewTransform.x = window.innerWidth / 2 - (minX + maxX) / 2;
+  viewTransform.y = window.innerHeight / 2 - (minY + maxY) / 2;
+  renderAll();
+}
+
+// ── Save / Load / Export ─────────────────────────────────
+let currentFigureName = null;
+
+async function saveJSON() {
+  let name = currentFigureName;
+  if (!name) {
+    name = prompt('Figure name:', 'untitled');
+    if (!name) return;
+  }
+  const resp = await fetch('/api/figures/' + encodeURIComponent(name), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nodes, connectors, nextId })
+  });
+  if (resp.ok) {
+    currentFigureName = name;
+    document.title = 'Tiling — ' + name;
+  } else {
+    alert('Save failed');
+  }
+}
+
+async function saveAsJSON() {
+  const name = prompt('Save as:', currentFigureName || 'untitled');
+  if (!name) return;
+  const resp = await fetch('/api/figures/' + encodeURIComponent(name), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nodes, connectors, nextId })
+  });
+  if (resp.ok) {
+    currentFigureName = name;
+    document.title = 'Tiling — ' + name;
+  } else {
+    alert('Save failed');
+  }
+}
+
+const loadDialog = document.getElementById('load-dialog');
+const loadDialogList = document.getElementById('load-dialog-list');
+document.getElementById('load-dialog-close').addEventListener('click', () => {
+  loadDialog.classList.remove('visible');
+});
+loadDialog.addEventListener('click', (e) => {
+  if (e.target === loadDialog) loadDialog.classList.remove('visible');
+});
+
+async function loadJSON() {
+  const resp = await fetch('/api/figures');
+  const files = await resp.json();
+  if (files.length === 0) { alert('No saved figures'); return; }
+  loadDialogList.innerHTML = '';
+  for (const name of files) {
+    const btn = document.createElement('button');
+    btn.className = 'figure-item';
+    btn.textContent = name;
+    btn.addEventListener('click', async () => {
+      loadDialog.classList.remove('visible');
+      const resp2 = await fetch('/api/figures/' + encodeURIComponent(name));
+      if (!resp2.ok) return;
+      const data = await resp2.json();
+      saveSnapshot();
+      nodes = data.nodes || [];
+      connectors = data.connectors || [];
+      nextId = data.nextId || 1;
+      selectedId = null;
+      selectedType = null;
+      connectingFrom = null;
+      editingNode = null;
+      currentFigureName = name;
+      document.title = 'Tiling — ' + name;
+      renderAll();
+    });
+    loadDialogList.appendChild(btn);
+  }
+  loadDialog.classList.add('visible');
+}
+
+function exportSVG() {
+  const svgClone = canvas.cloneNode(true);
+
+  // Remove editing textareas (foreignObject)
+  const fos = svgClone.querySelectorAll('foreignObject');
+  fos.forEach(fo => fo.remove());
+
+  // Compute tight viewBox
+  if (nodes.length > 0) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const n of nodes) {
+      minX = Math.min(minX, n.x);
+      minY = Math.min(minY, n.y);
+      maxX = Math.max(maxX, n.x + n.width);
+      maxY = Math.max(maxY, n.y + n.height);
+    }
+    const pad = 40;
+    svgClone.setAttribute('viewBox',
+      `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`);
+  }
+
+  // Reset transform on the world group for export
+  const worldClone = svgClone.getElementById('world');
+  if (worldClone) worldClone.setAttribute('transform', 'translate(0,0) scale(1)');
+
+  // Remove background rect (too large)
+  const bgRect = svgClone.querySelector('rect[width="200%"]');
+  if (bgRect) {
+    bgRect.setAttribute('x', '0');
+    bgRect.setAttribute('y', '0');
+    bgRect.setAttribute('width', '100%');
+    bgRect.setAttribute('height', '100%');
+  }
+
+  svgClone.removeAttribute('id');
+  svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  svgClone.removeAttribute('style');
+
+  const serializer = new XMLSerializer();
+  const svgStr = serializer.serializeToString(svgClone);
+  const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'decision-tree.svg';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Toolbar Buttons ──────────────────────────────────────
+document.getElementById('btn-layout').addEventListener('click', autoLayout);
+document.getElementById('btn-compact').addEventListener('click', compactLayout);
+document.getElementById('btn-save').addEventListener('click', saveJSON);
+document.getElementById('btn-save-as').addEventListener('click', saveAsJSON);
+document.getElementById('btn-load').addEventListener('click', loadJSON);
+document.getElementById('btn-export').addEventListener('click', exportSVG);
+document.getElementById('btn-hud').addEventListener('click', toggleHud);
+
+// ── Initial Render ───────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
