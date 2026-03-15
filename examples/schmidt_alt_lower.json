@@ -160,7 +160,7 @@
       "width": 200,
       "height": 80,
       "text": "Intake (understanding proposal)",
-      "style": "project"
+      "style": "outlined"
     },
     {
       "id": 74,
@@ -169,7 +169,7 @@
       "width": 200,
       "height": 80,
       "text": "Contextualization (relative to field, prior art, portfolio)",
-      "style": "project"
+      "style": "outlined"
     },
     {
       "id": 75,
@@ -178,21 +178,21 @@
       "width": 200,
       "height": 87.60000000000001,
       "text": "Evaluation (is this good, feasible, fundable, novel, etc..)",
-      "style": "rejected"
+      "style": "outlined"
     },
     {
       "id": 80,
-      "x": -761.7453818619683,
-      "y": 621.4298511119204,
+      "x": -753.7037283687183,
+      "y": 739.039033450702,
       "width": 200,
       "height": 80,
       "text": "Articulation",
-      "style": "project"
+      "style": "outlined"
     },
     {
       "id": 81,
-      "x": -757.9940110046484,
-      "y": 761.1995118206765,
+      "x": -760.004424377961,
+      "y": 607.4028887622698,
       "width": 200,
       "height": 80,
       "text": "Contestation",
@@ -205,7 +205,7 @@
       "width": 200,
       "height": 80,
       "text": "Resolution",
-      "style": "project"
+      "style": "outlined"
     },
     {
       "id": 86,
@@ -214,16 +214,16 @@
       "width": 200,
       "height": 80,
       "text": "Recommendation",
-      "style": "rejected"
+      "style": "outlined"
     },
     {
       "id": 87,
-      "x": 356.8323940835335,
-      "y": 687.4591078219153,
+      "x": 348.05423469783057,
+      "y": 685.7034759447747,
       "width": 200,
       "height": 80,
       "text": "Justification",
-      "style": "project"
+      "style": "outlined"
     },
     {
       "id": 88,
@@ -232,6 +232,78 @@
       "width": 200,
       "height": 80,
       "text": "Feedback",
+      "style": "outlined"
+    },
+    {
+      "id": 95,
+      "x": -443.9416350690583,
+      "y": 1034.8593740100055,
+      "width": 200,
+      "height": 80,
+      "text": "LLM grant summary and discussion",
+      "style": "project"
+    },
+    {
+      "id": 97,
+      "x": -212.198227286502,
+      "y": 1033.981558071435,
+      "width": 200,
+      "height": 80,
+      "text": "LLM literature review",
+      "style": "project"
+    },
+    {
+      "id": 99,
+      "x": -3.278033906773265,
+      "y": 1033.981558071435,
+      "width": 200,
+      "height": 80,
+      "text": "LLM grant portfolio database review",
+      "style": "project"
+    },
+    {
+      "id": 102,
+      "x": 268.8449070500163,
+      "y": 1030.470294317154,
+      "width": 200,
+      "height": 80,
+      "text": "LLM grading",
+      "style": "rejected"
+    },
+    {
+      "id": 105,
+      "x": 613.9780269049463,
+      "y": 740.4000787903461,
+      "width": 200,
+      "height": 80,
+      "text": "Streamlined/facilitated writing LLM tools",
+      "style": "project"
+    },
+    {
+      "id": 108,
+      "x": 613.5369516622662,
+      "y": 571.731031433703,
+      "width": 200,
+      "height": 80,
+      "text": "LLM generated recommendations",
+      "style": "rejected"
+    },
+    {
+      "id": 110,
+      "x": -945.4145197506381,
+      "y": 914.9532701108883,
+      "width": 200,
+      "height": 80,
+      "text": "Aggregating review notes",
+      "style": "project"
+    },
+    {
+      "id": 115,
+      "x": -1000.8870369031498,
+      "y": 692.1945043642245,
+      "width": 200,
+      "height": 80,
+      "text": "pre-deliberation stress-testing of recommendations",
       "style": "project"
     }
   ],
@@ -391,7 +463,67 @@
       "sourceId": 33,
       "targetId": 86,
       "label": ""
+    },
+    {
+      "id": 96,
+      "sourceId": 73,
+      "targetId": 95,
+      "label": ""
+    },
+    {
+      "id": 98,
+      "sourceId": 74,
+      "targetId": 97,
+      "label": ""
+    },
+    {
+      "id": 100,
+      "sourceId": 74,
+      "targetId": 99,
+      "label": ""
+    },
+    {
+      "id": 104,
+      "sourceId": 75,
+      "targetId": 102,
+      "label": ""
+    },
+    {
+      "id": 106,
+      "sourceId": 88,
+      "targetId": 105,
+      "label": ""
+    },
+    {
+      "id": 109,
+      "sourceId": 86,
+      "targetId": 108,
+      "label": ""
+    },
+    {
+      "id": 111,
+      "sourceId": 82,
+      "targetId": 110,
+      "label": ""
+    },
+    {
+      "id": 114,
+      "sourceId": 87,
+      "targetId": 105,
+      "label": ""
+    },
+    {
+      "id": 116,
+      "sourceId": 81,
+      "targetId": 115,
+      "label": ""
+    },
+    {
+      "id": 117,
+      "sourceId": 80,
+      "targetId": 115,
+      "label": ""
     }
   ],
-  "nextId": 95
+  "nextId": 119
 }

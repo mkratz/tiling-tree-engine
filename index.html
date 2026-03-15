@@ -204,6 +204,14 @@ function wrapText(text, maxWidth, fontSize) {
     const words = line.split(' ');
     let cur = '';
     for (const word of words) {
+      // Force-break words longer than maxChars (e.g. URLs)
+      if (word.length > maxChars) {
+        if (cur) { wrapped.push(cur); cur = ''; }
+        for (let i = 0; i < word.length; i += maxChars) {
+          wrapped.push(word.slice(i, i + maxChars));
+        }
+        continue;
+      }
       const test = cur ? cur + ' ' + word : word;
       if (test.length > maxChars && cur) {
         wrapped.push(cur);
